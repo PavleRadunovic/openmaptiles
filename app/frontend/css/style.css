@@ -1,0 +1,190 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+#mapOpenLayers,
+#mapLeaflet {
+    width: 100%;
+    height: 100%;
+    background-color: #f8f4f0;
+    z-index: 0;
+}
+
+#myInput {
+    /*background-image: url('/css/images/search_icon.png');*/
+    background-position: 10px 12px;
+    background-repeat: no-repeat;
+    width: 400px;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 1px solid #ddd;
+
+}
+
+#myUL {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#myUL li a {
+    border: 1px solid #ddd;
+    margin-top: -1px;
+    /* Prevent double borders */
+    background-color: #f6f6f6;
+    padding: 12px;
+    text-decoration: none;
+    font-size: 18px;
+    color: black;
+    display: block
+}
+
+#myUL li a:hover:not(.header) {
+    background-color: #eee;
+}
+
+#streets {
+    position: absolute;
+    background-color: #eee;
+    width: 400px;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 1px solid #ddd;
+    z-index: 1;
+    display: none;
+}
+
+#streets div {
+    border-bottom: 1px solid rgba(32, 32, 32, 0.493);
+    line-height: 1.5;
+}
+
+#streets p {
+    margin: 0;
+}
+
+.cont {
+    display: flex;
+    position: absolute;
+    top: 0px;
+    left: 900px;
+    background-color: #ada8a861;
+    box-shadow: rgb(0 0 0 / 25%) 0px 10px 20px, rgb(0 0 0 / 12%) 0px -12px 30px, rgb(0 0 0 / 12%) 0px 4px 6px, rgb(0 0 0 / 17%) 0px 12px 13px, rgb(0 0 0 / 9%) 0px -3px 5px;
+    border-radius: 10px;
+    width: 250px;
+}
+
+.baseMap>div {
+    flex: 1;
+    /*grow*/
+    margin: auto;
+    text-align: center;
+}
+
+.baseMap {
+    display: flex;
+    position: absolute;
+    top: 0px;
+    left: 600px;
+    background-color: #ada8a861;
+    box-shadow: rgb(0 0 0 / 25%) 0px 10px 20px, rgb(0 0 0 / 12%) 0px -12px 30px, rgb(0 0 0 / 12%) 0px 4px 6px, rgb(0 0 0 / 17%) 0px 12px 13px, rgb(0 0 0 / 9%) 0px -3px 5px;
+    border-radius: 10px;
+    width: 250px;
+}
+
+.cont>div {
+    flex: 1;
+    /*grow*/
+    margin: auto;
+    text-align: center;
+}
+
+.button {
+    background-color: #4CAF50;
+    /* Green */
+    border: none;
+    color: white;
+    padding: 5px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border-radius: 20px;
+}
+
+.button1 {
+    background-color: white;
+    color: black;
+    border: 2px solid #4CAF50;
+}
+
+.button1:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.button2 {
+    background-color: white;
+    color: black;
+    border: 2px solid #008CBA;
+}
+
+.button2:hover {
+    background-color: #008CBA;
+    color: white;
+}
+
+.openlayers {
+    background-color: white;
+    color: black;
+    border: 2px solid #27245691;
+    box-shadow: '0 10px 20px #93464640, 0 -12px 30px #0000001f, 0 4px 6px #0000001f, 0 12px 13px #0000002b, 0 -3px 5px #00000017';
+}
+
+.openlayers:hover {
+    background-color: #27245691;
+    color: white;
+}
+
+.leaflet {
+    background-color: white;
+    color: black;
+    border: 2px solid #9b9749c7;
+    box-shadow: '0 10px 20px #93464640, 0 -12px 30px #0000001f, 0 4px 6px #0000001f, 0 12px 13px #0000002b, 0 -3px 5px #00000017';
+}
+
+.leaflet:hover {
+    background-color: #9b9749c7;
+    color: white;
+}
+
+.styles {
+    z-index: 1;
+    display: grid;
+    position: absolute;
+    right: 50px;
+    background-color: #bbb4b4cf;
+    top: 100px;
+    width: 170px;
+    padding: 20px;
+    box-shadow: 0 10px 20px #00000040, 0 -12px 30px #0000001f, 0 4px 6px #0000001f, 0 12px 13px #0000002b, 0 -3px 5px #00000017;
+}
+
+.selectedStreet:hover {
+    cursor: pointer;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 10px;
+}
+
+li:hover {
+    color: rgb(136, 71, 71);
+    cursor: pointer
+}

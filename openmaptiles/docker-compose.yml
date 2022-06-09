@@ -1,0 +1,145 @@
+# This version must match the MAKE_DC_VERSION value below
+version: "3"
+
+networks:
+  postgres:
+    driver: bridge
+
+services:
+
+  postgres:
+    image: "${POSTGIS_IMAGE:-openmaptiles/postgis}:${TOOLS_VERSION}"
+    # Use "command: postgres -c jit=off" for PostgreSQL 11+ because of slow large MVT query processing
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - postgres
+    ports:
+      - "8202:5432"
+    env_file: .env-postgres
+
+  import-data:
+    image: "openmaptiles/import-data:${TOOLS_VERSION}"
+    env_file: .env
+    networks:
+      - postgres
+
+  openmaptiles-tools: &openmaptiles-tools
+    image: "openmaptiles/openmaptiles-tools:${TOOLS_VERSION}"
+    env_file: .env
+    environment:
+      # Must match the version of this file (first line)
+      # download-osm will use it when generating a composer file
+      MAKE_DC_VERSION: "3"
+      # Allow DIFF_MODE, MIN_ZOOM, and MAX_ZOOM to be overwritten from shell
+      DIFF_MODE: ${DIFF_MODE}
+      MIN_ZOOM: ${MIN_ZOOM}
+      MAX_ZOOM: ${MAX_ZOOM}
+      #Provide BBOX from *.bbox file if exists, else from .env
+      BBOX: ${BBOX}
+      # Imposm configuration file describes how to load updates when enabled
+      IMPOSM_CONFIG_FILE: ${IMPOSM_CONFIG_FILE}
+      # Control import-sql processes
+      MAX_PARALLEL_PSQL: ${MAX_PARALLEL_PSQL}
+    networks:
+      - postgres
+    volumes:
+      - .:/tileset
+      - ./data:/import
+      - ./data:/export
+      - ./build/sql:/sql
+      - ./build:/mapping
+      - ./cache:/cache
+
+  update-osm:
+    <<: *openmaptiles-tools
+    command: import-update
+
+  generate-changed-vectortiles:
+    image: "openmaptiles/generate-vectortiles:${TOOLS_VERSION}"
+    command: ./export-list.sh
+    volumes:
+      - ./data:/export
+      - ./build/openmaptiles.tm2source:/tm2source
+    networks:
+      - postgres
+    env_file: .env
+    environment:
+      MBTILES_NAME: ${MBTILES_FILE}
+      # Control tilelive-copy threads
+      COPY_CONCURRENCY: ${COPY_CONCURRENCY}
+
+  generate-vectortiles:
+    image: "openmaptiles/generate-vectortiles:${TOOLS_VERSION}"
+    volumes:
+      - ./data:/export
+      - ./build/openmaptiles.tm2source:/tm2source
+    networks:
+      - postgres
+    env_file: .env
+    environment:
+      MBTILES_NAME: ${MBTILES_FILE}
+      BBOX: ${BBOX}
+      MIN_ZOOM: ${MIN_ZOOM}
+      MAX_ZOOM: ${MAX_ZOOM}
+      # Control tilelive-copy threads
+      COPY_CONCURRENCY: ${COPY_CONCURRENCY}
+      #
+
+  postserve:
+    image: "openmaptiles/openmaptiles-tools:${TOOLS_VERSION}"
+    command: "postserve ${TILESET_FILE} --verbose --serve=${OMT_HOST:-http://localhost}:${PPORT:-8090}"
+    env_file: .env
+    environment:
+      TILESET_FILE: ${TILESET_FILE}
+    networks:
+      - postgres
+    ports:
+      - "${PPORT:-8090}:${PPORT:-8090}"
+    volumes:
+      - .:/tileset
+
+  maputnik_editor:
+    image: "maputnik/editor"
+    ports:
+      - "8203:8888"
+
+  tileserver-gl:
+    image: "maptiler/tileserver-gl"
+    command:
+      - --port
+      - "${TPORT:-8080}"
+    ports:
+      - "${TPORT:-8080}:${TPORT:-8080}"
+    volumes:
+      - ./data:/data
+  backend:
+    container_name: openmaptiles_backend
+    image: openmaptiles_backend
+    build: ../app/backend
+    expose:
+        - 5000
+    ports:
+        - 6002:5000
+    restart: unless-stopped
+    #volumes:
+    #    - ./backend:/project
+    environment:
+        - FLASK_ENV=development
+        - FLASK_APP=app.py
+        - FLASK_DEBUG=1
+    networks:
+      - postgres
+  frontend:
+    container_name: openmaptiles_front
+    image: openmaptiles_front
+    build: ../app/frontend
+    expose:
+        - 1234
+    ports:
+        - 6001:1234
+    #volumes:
+    #    - ./frontend:/app
+    restart: unless-stopped
+    links:
+        - backend
